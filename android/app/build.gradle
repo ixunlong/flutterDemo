@@ -1,0 +1,162 @@
+def localProperties = new Properties()
+def localPropertiesFile = rootProject.file('local.properties')
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.withReader('UTF-8') { reader ->
+        localProperties.load(reader)
+    }
+}
+
+def flutterRoot = localProperties.getProperty('flutter.sdk')
+if (flutterRoot == null) {
+    throw new GradleException("Flutter SDK not found. Define location with flutter.sdk in the local.properties file.")
+}
+
+def flutterVersionCode = localProperties.getProperty('flutter.versionCode')
+if (flutterVersionCode == null) {
+    flutterVersionCode = '1'
+}
+
+def flutterVersionName = localProperties.getProperty('flutter.versionName')
+if (flutterVersionName == null) {
+    flutterVersionName = '1.0'
+}
+
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
+
+def keystorePropertiesFile = rootProject.file("key.properties")
+def keystoreProperties = new Properties()
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+}
+
+android {
+    compileSdk 33
+    ndkVersion flutter.ndkVersion
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+    }
+
+    // productFlavors {
+    //     flavorDimensions "channel"
+    //     xiaomi {
+    //         manifestPlaceholders = [channel_value: "umeng"]
+    //         dimension = "channel"
+    //     }
+    // }
+
+    defaultConfig {
+        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
+        applicationId "com.jykj.hqh"
+        // You can update the following values to match your application needs.
+        // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-build-configuration.
+        minSdkVersion 19
+        targetSdkVersion flutter.targetSdkVersion
+        versionCode flutterVersionCode.toInteger()
+        versionName flutterVersionName
+        multiDexEnabled true
+        
+        ndk {
+            //选择要添加的对应 cpu 类型的 .so 库。
+            abiFilters 'armeabi', 'armeabi-v7a', 'x86', 'x86_64', 'mips', 'mips64', 'arm64-v8a'     
+        }
+
+        manifestPlaceholders = [
+            // JPUSH_PKGNAME : applicationId,
+            // JPUSH_APPKEY : "9b221e8c46238cba451a06c6", 
+            // JPUSH_CHANNEL : "developer-default", //暂时填写默认值即可.
+            // MEIZU_APPKEY : "bcc0c7bd4dc74c5387c7bd313baa3689",
+            // MEIZU_APPID : "150372",
+            // XIAOMI_APPID : "MI-2882303761520197597",
+            // XIAOMI_APPKEY : "MI-5492019719597",
+            // OPPO_APPKEY : "OP-d07a5559f1b84000a3e4ef0c070fe7b5",
+            // OPPO_APPID : "OP-30907877",
+            // OPPO_APPSECRET : "OP-8f6a24bac8f34b1c8902938b1b109f44",
+            // VIVO_APPKEY : "217b5306afda7c4c91147c4aa5c2c7c6",
+            // VIVO_APPID : "105604675",
+            // HONOR_APPID : "104408007",
+            TENCENT_APP_ID: "102033150"
+        ]
+        // addManifestPlaceholders([
+        //     TENCENT_APP_ID: "102033150"
+        // ])
+    }
+
+    repositories {
+        flatDir {
+            dirs 'libs'
+        }
+    }
+
+    signingConfigs {
+         debug {
+             keyAlias 'myalias'
+             keyPassword 'tttttt'
+             storeFile file('/Users/beiweitongxinmajin/keydir/test.keystore')
+             storePassword 'tttttt'
+         }
+//        release {
+//            keyAlias keystoreProperties['keyAlias']
+//            keyPassword keystoreProperties['keyPassword']
+//            storeFile file(keystoreProperties['storeFile'])
+//            storePassword keystoreProperties['storePassword']
+//        }
+    }
+
+    buildTypes {
+//        release {
+//            // TODO: Add your own signing config for the release build.
+//            // Signing with the debug keys for now, so `flutter run --release` works.
+//            signingConfig signingConfigs.release
+//            minifyEnabled false
+//            shrinkResources false
+//        }
+        debug {
+            // TODO: Add your own signing config for the release build.
+            // Signing with the debug keys for now, so `flutter run --release` works.
+            signingConfig signingConfigs.debug
+            minifyEnabled false
+            shrinkResources false
+        }
+    }
+}
+
+flutter {
+    source '../..'
+}
+
+dependencies {
+    api 'com.android.support:appcompat-v7:28.0.0'
+    implementation 'com.android.support:multidex:1.0.3'
+    implementation 'androidx.multidex:multidex:2.0.1'
+
+    api 'com.aliyun.ams:alicloud-android-push:3.8.2'
+    api 'com.aliyun.ams:alicloud-android-third-push:3.8.2'
+    api "com.aliyun.ams:alicloud-android-third-push-xiaomi:3.8.2"
+    api "com.aliyun.ams:alicloud-android-third-push-oppo:3.8.2"
+    api 'com.aliyun.ams:alicloud-android-third-push-vivo:3.8.2'
+    // implementation 'cn.jiguang.sdk:jcore:3.3.6'  // 此处以JCore 4.1.0 版本为例。
+    // implementation 'cn.jiguang.sdk:jpush:4.8.4'
+
+    // // implementation 'cn.jiguang.sdk.plugin:meizu:4.0.0'
+    // implementation 'cn.jiguang.sdk.plugin:xiaomi:4.8.4'
+    // implementation 'cn.jiguang.sdk.plugin:vivo:4.8.4'
+    // implementation 'cn.jiguang.sdk.plugin:oppo:4.8.4'
+
+    // implementation 'cn.jiguang.sdk.plugin:honor:4.8.4'
+    // implementation(name: 'HiPushSdk-v7.0.1.103', ext: 'aar')
+
+    // implementation 'cn.jiguang.sdk.plugin:huawei:4.8.4'
+    // implementation 'com.huawei.hms:push:6.3.0.304'
+    // implementation(name: 'com.heytap.msp-push-3.1.0', ext: 'aar')
+    implementation 'com.google.code.gson:gson:2.6.2'
+    implementation 'commons-codec:commons-codec:1.6'
+    implementation 'androidx.annotation:annotation:1.1.0'
+    
+    
+}
+
+apply plugin: 'com.huawei.agconnect'
